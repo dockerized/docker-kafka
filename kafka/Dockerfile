@@ -1,6 +1,6 @@
 # Kafka and Zookeeper
 
-FROM java:openjdk-8-jre
+FROM xiocode/java:7
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -8,18 +8,22 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get install -y zookeeper wget supervisor dnsutils && \
     rm -rf /var/lib/apt/lists/* && \
-    wget -q http://apache.mirrors.spacedump.net/kafka/0.8.1.1/kafka_2.8.0-0.8.1.1.tgz -O /tmp/kafka_2.8.0-0.8.1.1.tgz && \
-    tar xfz /tmp/kafka_2.8.0-0.8.1.1.tgz -C /opt && \
-    rm /tmp/kafka_2.8.0-0.8.1.1.tgz
+    wget -q http://mirror.cc.columbia.edu/pub/software/apache/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz -O /tmp/kafka.tgz && \
+    mkdir /usr/local/kafka && \
+    tar xfz /tmp/kafka.tgz -C /usr/local/kafka --strip-components=1 && \
+    rm /tmp/kafka.tgz
 
-ENV KAFKA_HOME /opt/kafka_2.8.0-0.8.1.1
+ENV KAFKA_HOME /usr/local/kafka
 ADD scripts/start-kafka.sh /usr/bin/start-kafka.sh
 
 # Supervisor config
 ADD supervisor/kafka.conf /etc/supervisor/conf.d/kafka.conf
-ADD supervisor/zookeeper.conf /etc/supervisor/conf.d/zookeeper.conf
 
-# 2181 is zookeeper, 9092 is kafka
-EXPOSE 2181 9092
+# KAFKA config
+
+VOLUME ["/usr/local/kafka/config","/var/log", "/var/lib/kafka"]
+
+# 9092 is kafka
+EXPOSE 9092
 
 CMD ["supervisord", "-n"]
