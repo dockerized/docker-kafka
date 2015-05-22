@@ -21,7 +21,7 @@ ADD supervisor/kafka.conf /etc/supervisor/conf.d/kafka.conf
 
 # KAFKA config
 
-VOLUME ["/usr/local/kafka/config","/var/log", "/var/lib/kafka"]
+VOLUME ["/usr/local/kafka/config","/usr/local/kafka/logs", "/var/lib/kafka"]
 
 # 9092 is kafka
 EXPOSE 9092
